@@ -75,6 +75,7 @@
 		AC61CE901EB9865700878942 /* YHCellProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YHCellProgress.m; sourceTree = "<group>"; };
 		AC61CE921EB9883F00878942 /* SimulateDownLoadVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimulateDownLoadVC.h; sourceTree = "<group>"; };
 		AC61CE931EB9883F00878942 /* SimulateDownLoadVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimulateDownLoadVC.m; sourceTree = "<group>"; };
+		AC6DAEA51EC017FD0008A7D1 /* YHDownLoad.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YHDownLoad.pch; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +112,7 @@
 				AC61CE4D1EB984E300878942 /* AppDelegate.m */,
 				AC61CE4F1EB984E300878942 /* ViewController.h */,
 				AC61CE501EB984E300878942 /* ViewController.m */,
+				AC6DAEA51EC017FD0008A7D1 /* YHDownLoad.pch */,
 				AC61CE921EB9883F00878942 /* SimulateDownLoadVC.h */,
 				AC61CE931EB9883F00878942 /* SimulateDownLoadVC.m */,
 				AC61CE8E1EB9863A00878942 /* View */,
@@ -404,6 +406,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GCC_PREFIX_HEADER = YHDownLoad/YHDownLoad.pch;
 				INFOPLIST_FILE = YHDownLoad/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.samuelandkevin--github-https---github.com-samuelandkevin-YHDownLoad.YHDownLoad";
@@ -415,6 +418,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GCC_PREFIX_HEADER = YHDownLoad/YHDownLoad.pch;
 				INFOPLIST_FILE = YHDownLoad/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.samuelandkevin--github-https---github.com-samuelandkevin-YHDownLoad.YHDownLoad";

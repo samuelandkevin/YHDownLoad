@@ -18,6 +18,8 @@
 - (void)updateProgress:(float)progress atIndexPath:(NSIndexPath *)indexPath ;
 //暂停下载 (indexPath:路径)
 - (void)pauseDownLoad:(BOOL)pause atIndexPath:(NSIndexPath *)indexPath nextTask:(NSNumber *)nextTask;
+//恢复下载 (indexPath:路径)
+- (void)resumeDownLoadAtIndexPath:(NSIndexPath *)indexPath pauseTask:(NSNumber *)pauseTask;
 @end
 
 @interface YHCellProgress : UITableViewCell

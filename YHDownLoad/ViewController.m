@@ -10,16 +10,9 @@
 #import "SimulateDownLoadVC.h"
 #import "Masonry.h"
 
-#define RGBCOLOR(r,g,b) [UIColor colorWithRed:(r)/255.0f green:(g)/255.0f blue:(b)/255.0f alpha:1]
-#define RGB16(rgbValue)\
-\
-[UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 \
-green:((float)((rgbValue & 0xFF00) >> 8))/255.0 \
-blue:((float)(rgbValue & 0xFF))/255.0 \
-alpha:1.0]
-#define kBlueColor  RGB16(0x0e92dd)          //蓝色
 
-@interface ViewController ()<UITableViewDelegate,UITableViewDataSource>
+
+@interface ViewController ()<UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate>
 @property (nonatomic,strong) UITableView *tableView;
 @end
 
@@ -56,6 +49,7 @@ alpha:1.0]
     tf.placeholder = @"并发数量";
     tf.tag = 1001;
     tf.text = @"20";
+    tf.delegate = self;
     [tf becomeFirstResponder];
     [self.view addSubview:tf];
     
@@ -80,6 +74,12 @@ alpha:1.0]
     
 }
 
+#pragma mark - UITextFieldDelegate
+- (BOOL)textFieldShouldReturn:(UITextField *)textField{
+    [self _pushVC];
+    return YES;
+}
+
 #pragma mark - UITableViewDataSource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return 1;
@@ -99,12 +99,16 @@ alpha:1.0]
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if (indexPath.row == 0) {
-        SimulateDownLoadVC *vc = [SimulateDownLoadVC new];
-        vc.aTitle = @"YHDownLoad->模拟下载";
-        UITextField *tf = [self.view viewWithTag:1001];
-        vc.taskCount = [tf.text integerValue];
-        [self.navigationController pushViewController:vc animated:YES];
+        [self _pushVC];
     }
+}
+
+- (void)_pushVC{
+    SimulateDownLoadVC *vc = [SimulateDownLoadVC new];
+    vc.aTitle = @"YHDownLoad->模拟下载";
+    UITextField *tf = [self.view viewWithTag:1001];
+    vc.taskCount = [tf.text integerValue];
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 - (void)didReceiveMemoryWarning {

@@ -20,6 +20,7 @@
 @property (nonatomic,strong)NSMutableArray <YHDownLoadModel *>*waitingTasks;
 //等待中的任务
 
+
 /******实际开发可以替换******/
 @property (nonatomic,strong)NSMutableArray <NSTimer *>*timerArray;//所有定时器数组,模拟下载任务
 
@@ -134,23 +135,36 @@
         if (timer == model.timer) {
             [timer setFireDate:[NSDate distantFuture]];
 
-            //进行中的最后一个任务下标
-            YHDownLoadModel *lastDownLoading = self.downLoadingTasks.lastObject;
-            NSUInteger lastDownLoadingIndex  = lastDownLoading.indexPath.row;
-          
+
+            //进行中任务最后一个下标
+            NSUInteger indexLastDownLoading = 0;
+            for (YHDownLoadModel *aModel in self.downLoadingTasks) {
+                if (aModel.indexPath.row > indexLastDownLoading) {
+                    indexLastDownLoading = aModel.indexPath.row;
+                }
+            }
+            
+            //移除下载中的任务
             [self.downLoadingTasks removeObject:model];
             
+
             //最大并发量限制
             if (self.downLoadingTasks.count  < self.maxConcurrentCount) {
                
                 //开启下一个任务
-                NSUInteger nextTaskIndex = lastDownLoadingIndex+1;
-                if (nextTaskIndex < _timerArray.count) {
-                    NSTimer *timer = _timerArray[nextTaskIndex];
-                    [timer setFireDate:[NSDate distantPast]];
-                    [self.downLoadingTasks addObject:_downLoadQueue[nextTaskIndex]];
-                    return @(nextTaskIndex);
+                NSUInteger nextTaskIndex = indexLastDownLoading+1;
+                
+                if (nextTaskIndex < _downLoadQueue.count) {
+                    YHDownLoadModel *nextModel = _downLoadQueue[nextTaskIndex];
+                    if (nextTaskIndex < _timerArray.count && nextModel.status ==  Status_isWaiting) {
+                        NSTimer *timer = _timerArray[nextTaskIndex];
+                        [timer setFireDate:[NSDate distantPast]];
+                        [self.downLoadingTasks addObject:nextModel];
+                        return @(nextTaskIndex);
+                    }
+
                 }
+                
                 
                 
             }
@@ -162,26 +176,55 @@
 }
 
 //恢复下载
-- (void)resumeDownLoadWithModel:(YHDownLoadModel *)model{
+- (NSNumber *)resumeDownLoadWithModel:(YHDownLoadModel *)model{
     for(NSTimer *timer in _timerArray){
         if (timer == model.timer) {
             [timer setFireDate:[NSDate distantPast]];
 
-            YHDownLoadModel *lastDownLoading = self.downLoadingTasks.lastObject;
-            NSUInteger pauseTaskIndex = lastDownLoading.indexPath.row;
+            //添加进行中任务
+            NSUInteger index = [_timerArray indexOfObject:timer];
+            YHDownLoadModel *addModel = [self.downLoadQueue objectAtIndex:index];
+            [self.downLoadingTasks addObject:addModel];
             
+            //进行中任务最后一个下标
+            NSUInteger indexLastDownLoading = 0;
+            for (YHDownLoadModel *aModel in self.downLoadingTasks) {
+                if (aModel.indexPath.row > indexLastDownLoading) {
+                    indexLastDownLoading = aModel.indexPath.row;
+                }
+            }
+            
+
             //最大并发数量限制
-            if(self.downLoadingTasks.count + 1 > self.maxConcurrentCount){
+            if(self.downLoadingTasks.count > self.maxConcurrentCount){
+                
+                //进行中的第一个任务暂停
+                NSInteger indexOfFirstTask = MAXFLOAT;
+                for (YHDownLoadModel *aModel in self.downLoadingTasks) {
+                    if (aModel.indexPath.row < indexOfFirstTask && model.indexPath.row != aModel.indexPath.row) {
+                        indexOfFirstTask = aModel.indexPath.row;
+                    }
+                }
+                
                 
                 //定时器暂停
-                NSTimer *lastTimer = [_timerArray objectAtIndex:pauseTaskIndex];
-                [lastTimer setFireDate:[NSDate distantFuture]];
+                if (indexOfFirstTask < _timerArray.count) {
+                    NSTimer *pauseTimer = [_timerArray objectAtIndex:indexOfFirstTask];
+                    [pauseTimer setFireDate:[NSDate distantFuture]];
+                }
+               
                 
+                //移除进行中任务
+                if (indexOfFirstTask < self.downLoadingTasks.count) {
+                    [self.downLoadingTasks removeObjectAtIndex:indexOfFirstTask];
+                }
+                return @(indexOfFirstTask);
             }
             
             break;
         }
     }
+    return @(-1);
 }
 
 
@@ -222,6 +265,7 @@
                 }
                 model.downLoadProgress = progress;
                 NSLog(@"更新下载任务%@进度",model.url);
+                
                 
                 if (model.bytesWritten >= model.totalBytesWritten) {
                     

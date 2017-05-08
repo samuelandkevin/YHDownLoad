@@ -137,6 +137,18 @@
     
 }
 
+- (void)resumeDownLoadAtIndexPath:(NSIndexPath *)indexPath pauseTask:(NSNumber *)pauseTask{
+    int pauseTaskIndex = [pauseTask intValue];
+   
+    if (pauseTaskIndex >= 0) {
+        NSIndexPath *pauseIndextPath = [NSIndexPath indexPathForRow:pauseTaskIndex inSection:indexPath.section];
+        YHCellProgress *pauseCell = [self.tableView cellForRowAtIndexPath:pauseIndextPath];
+        YHDownLoadModel *pauseModel = self.dataArray[pauseTaskIndex];
+        pauseModel.status = Status_isPaused;
+        [pauseCell updateUIWithStatus:Status_isPaused];
+    }
+}
+
 - (void)pauseDownLoad:(BOOL)pause atIndexPath:(NSIndexPath *)indexPath nextTask:(NSNumber *)nextTask{
     NSIndexPath *nextInextPath = [NSIndexPath indexPathForRow:[nextTask integerValue] inSection:indexPath.section];
     YHCellProgress *nextCell = [self.tableView cellForRowAtIndexPath:nextInextPath];
@@ -144,6 +156,8 @@
         YHDownLoadModel *nextModel = self.dataArray[nextInextPath.row];
         nextModel.status = Status_isDownLoading;
         [nextCell updateUIWithStatus:Status_isDownLoading];
+    }else{
+        NSLog(@"...");
     }
     
 }

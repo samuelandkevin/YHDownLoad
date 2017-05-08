@@ -15,6 +15,7 @@
 @property (nonatomic,strong) UIImageView *imgvAvatar;
 @property (nonatomic,strong) UILabel *lbTitle;
 @property (nonatomic,strong) UIButton *btnDownLoad;
+@property (nonatomic,strong) UIView *viewBotLine;
 @end
 
 @implementation YHCellProgress
@@ -37,15 +38,22 @@
         [self.contentView addSubview:_lbTitle];
         
         _progressV = [UIProgressView new];
-        _progressV.progressTintColor = [UIColor blueColor];;
-        _progressV.backgroundColor   = [UIColor grayColor];
+        _progressV.progressTintColor = [UIColor blueColor];
+        _progressV.backgroundColor   = kGrayColor;
         [self.contentView addSubview:_progressV];
         
         _btnDownLoad = [UIButton new];
+        _btnDownLoad.layer.cornerRadius  = 5;
+        _btnDownLoad.layer.masksToBounds = YES;
         _btnDownLoad.titleLabel.font = [UIFont systemFontOfSize:14.0];
+        [_btnDownLoad setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         _btnDownLoad.backgroundColor = [UIColor orangeColor];
         [_btnDownLoad addTarget:self action:@selector(onDownLoad:) forControlEvents:UIControlEventTouchUpInside];
         [self.contentView addSubview:_btnDownLoad];
+        
+        _viewBotLine = [UIView new];
+        _viewBotLine.backgroundColor = [UIColor blackColor];
+        [self.contentView addSubview:_viewBotLine];
         
         __weak typeof(self)weakSelf = self;
         [_imgvAvatar mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -60,6 +68,7 @@
             make.right.lessThanOrEqualTo(weakSelf.contentView.mas_right).offset(-10);
         }];
         
+        
         [_progressV mas_makeConstraints:^(MASConstraintMaker *make) {
             make.left.equalTo(weakSelf.imgvAvatar.mas_right).offset(10);
             make.centerY.equalTo(weakSelf.contentView.mas_centerY).offset(5);
@@ -71,6 +80,11 @@
             make.centerY.equalTo(weakSelf.contentView);
             make.right.equalTo(weakSelf.contentView).offset(-3);
         }];
+        
+        [_viewBotLine mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.height.mas_equalTo(0.5);
+            make.left.right.bottom.equalTo(weakSelf.contentView);
+        }];
 
     }
     return self;
@@ -79,8 +93,13 @@
 #pragma mark - Action
 - (void)onDownLoad:(UIButton *)sender{
     if (_model.status == Status_isPaused) {
+        
         _model.status = Status_isDownLoading;
-        [[YHDownLoadManager sharedInstance] resumeDownLoadWithModel:_model];
+        NSNumber *firstTaskIndex = [[YHDownLoadManager sharedInstance] resumeDownLoadWithModel:_model];
+        if (_delegate && [_delegate respondsToSelector:@selector(resumeDownLoadAtIndexPath:pauseTask:)]) {
+            [_delegate resumeDownLoadAtIndexPath:_model.indexPath pauseTask:firstTaskIndex];
+        }
+        
     }else if(_model.status == Status_isDownLoading){
         _model.status = Status_isPaused;
         NSNumber *nextTaskIndex = [[YHDownLoadManager sharedInstance] pauseDownLoadWithModel:_model];
@@ -104,26 +123,31 @@
         case Status_UnDownLoaded:
         {
             [_btnDownLoad setTitle:@"未开始" forState:UIControlStateNormal];
+            _btnDownLoad.backgroundColor = [UIColor grayColor];
         }
             break;
         case Status_isWaiting:
         {
             [_btnDownLoad setTitle:@"等待中" forState:UIControlStateNormal];
+            _btnDownLoad.backgroundColor = [UIColor orangeColor];
         }
             break;
         case Status_isPaused:
         {
             [_btnDownLoad setTitle:@"暂停" forState:UIControlStateNormal];
+            _btnDownLoad.backgroundColor = [UIColor grayColor];
         }
             break;
         case Status_isDownLoading:
         {
             [_btnDownLoad setTitle:@"下载中" forState:UIControlStateNormal];
+            _btnDownLoad.backgroundColor = kBlueColor;
         }
             break;
         case Status_isDownLoaded:
         {
             [_btnDownLoad setTitle:@"已完成" forState:UIControlStateNormal];
+            _btnDownLoad.backgroundColor = [UIColor greenColor];
         }
             break;
             
@@ -167,17 +191,7 @@
         
         
     }
-//    else if(_model.status == Status_isDownLoading){
-//        //进行中
-//        _progressV.hidden       = NO;
-//        [self.progressV setProgress:_model.downLoadProgress];
-//        
-//    }else if(_model.status == Status_isPaused){
-//        //暂停
-//        _progressV.hidden       = NO;
-//        [self.progressV setProgress:_model.downLoadProgress];
-//        
-//    }
+
     else{
         _progressV.hidden       = NO;
         [self.progressV setProgress:_model.downLoadProgress];
