@@ -41,17 +41,32 @@
     self.tableView.backgroundColor = [UIColor orangeColor];
     
     //control panel
-    UILabel *lb = [[UILabel alloc] init];
-    lb.text = @"  设置并发数量—>:";
-    [self.view addSubview:lb];
+    //下载任务数量
+    UILabel *lbTotalTasks = [[UILabel alloc] init];
+    lbTotalTasks.text = @"  下载任务数量—>:";
+    [self.view addSubview:lbTotalTasks];
     
-    UITextField *tf = [[UITextField alloc] init];
-    tf.placeholder = @"并发数量";
-    tf.tag = 1001;
-    tf.text = @"20";
-    tf.delegate = self;
-    [tf becomeFirstResponder];
-    [self.view addSubview:tf];
+    UITextField *tfTotalTasks = [[UITextField alloc] init];
+    tfTotalTasks.placeholder = @"下载任务数量";
+    tfTotalTasks.tag = 1001;
+    tfTotalTasks.text = @"20";
+    tfTotalTasks.delegate = self;
+    [tfTotalTasks becomeFirstResponder];
+    [self.view addSubview:tfTotalTasks];
+    
+    //并发数量
+    UILabel *lbConcurrentCount = [[UILabel alloc] init];
+    lbConcurrentCount.text = @"  并发任务数量—>:";
+    [self.view addSubview:lbConcurrentCount];
+    
+    UITextField *tfConcurrentCount = [[UITextField alloc] init];
+    tfConcurrentCount.placeholder = @"并发任务数量";
+    tfConcurrentCount.tag = 1002;
+    tfConcurrentCount.text = @"2";
+    tfConcurrentCount.delegate = self;
+    [tfConcurrentCount becomeFirstResponder];
+    [self.view addSubview:tfConcurrentCount];
+    
     
     __weak typeof(self)weakSelf = self;
     [self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -59,18 +74,29 @@
         make.height.mas_equalTo(100);
     }];
     
-    [lb mas_makeConstraints:^(MASConstraintMaker *make) {
+    [lbTotalTasks mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(weakSelf.view);
-        make.centerY.equalTo(tf.mas_centerY);
+        make.centerY.equalTo(tfTotalTasks.mas_centerY);
     }];
     
-    [tf mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(lb.mas_right).offset(5);
+    [tfTotalTasks mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(lbTotalTasks.mas_right).offset(5);
         make.top.equalTo(weakSelf.tableView.mas_bottom);
         make.width.mas_equalTo(80);
         make.height.mas_equalTo(30);
     }];
     
+    [lbConcurrentCount mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(weakSelf.view);
+        make.centerY.equalTo(tfConcurrentCount.mas_centerY);
+    }];
+    
+    [tfConcurrentCount mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(lbConcurrentCount.mas_right).offset(5);
+        make.top.equalTo(tfTotalTasks.mas_bottom);
+        make.width.mas_equalTo(80);
+        make.height.mas_equalTo(30);
+    }];
     
 }
 
@@ -106,8 +132,10 @@
 - (void)_pushVC{
     SimulateDownLoadVC *vc = [SimulateDownLoadVC new];
     vc.aTitle = @"YHDownLoad->模拟下载";
-    UITextField *tf = [self.view viewWithTag:1001];
-    vc.taskCount = [tf.text integerValue];
+    UITextField *tf1 = [self.view viewWithTag:1001];
+    vc.taskCount     = [tf1.text integerValue];
+    UITextField *tf2 = [self.view viewWithTag:1002];
+    vc.concurrentCount = [tf2.text integerValue];
     [self.navigationController pushViewController:vc animated:YES];
 }
 

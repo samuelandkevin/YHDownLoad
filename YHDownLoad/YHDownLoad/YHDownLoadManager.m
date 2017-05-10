@@ -14,6 +14,8 @@
 
 @interface YHDownLoadManager()
 
+@property (nonatomic,strong)dispatch_semaphore_t sem;
+
 @property (nonatomic,strong)NSMutableArray <YHDownLoadModel *>*downLoadQueue;//所有任务
 @property (nonatomic,strong)NSMutableArray <YHDownLoadModel *>*pausedTasks;//暂停的任务
 @property (nonatomic,strong)NSMutableArray <YHDownLoadModel *>*downLoadingTasks;//进行中的任务
@@ -108,7 +110,7 @@
         model.timer = timer;
         
         /**实际开发在此把代码替换掉,现在用定时器模拟下载进度值**/
-        if (self.timerArray.count < self.maxConcurrentCount) {
+        if (self.downLoadingTasks.count < self.maxConcurrentCount) {
             //开启定时器
             [timer setFireDate:[NSDate distantPast]];
             model.status = Status_isDownLoading;
@@ -122,7 +124,7 @@
             [self.waitingTasks addObject:model];
         }
         [self.timerArray addObject:timer];
-        
+
         
     }
     return model.status;
@@ -293,6 +295,16 @@
                             YHDownLoadModel *nextModel = [weakSelf.downLoadQueue objectAtIndex:nextTaskIndex];
                             
                             if (nextModel.status == Status_isWaiting) {
+                                
+                                //移除等待中的任务
+                                for (YHDownLoadModel *waitModel in weakSelf.waitingTasks) {
+                                    if ([waitModel.url isEqualToString:nextModel.url]) {
+                                        [weakSelf.waitingTasks removeObject:waitModel];
+                                        break;
+                                    }
+                                }
+                                
+                                
                                 [nextTasks addObject:@(model.indexPath.row+i+1)];
                                 [timer setFireDate:[NSDate distantPast]];
                                 [self.downLoadingTasks addObject:nextModel];
@@ -305,10 +317,8 @@
                     model.complete(YES, model.url,model.indexPath,nextTasks);
                     
                     
-                    //从队列中移除已完成任务
-//                    [weakSelf.downLoadQueue removeObject:model];
-//                    [weakSelf.timerArray removeObject:model.timer];
-                    
+
+                    //移除下载中已完成的任务
                     for (YHDownLoadModel *downLoading in weakSelf.downLoadingTasks) {
                         if ([downLoading.url isEqualToString:model.url]) {
                             [weakSelf.downLoadingTasks removeObject:downLoading];
@@ -318,6 +328,7 @@
                     
                     [model.timer invalidate];
                      model.timer = nil;
+                    NSLog(@"进行中的还有%lu--等待中的还有%lu",(unsigned long)self.downLoadingTasks.count,self.waitingTasks.count);
 
 
                 }else{

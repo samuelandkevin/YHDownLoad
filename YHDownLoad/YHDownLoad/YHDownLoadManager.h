@@ -13,7 +13,8 @@
 
 //最大的并发数量 (默认是:1)
 @property (nonatomic,assign)NSUInteger maxConcurrentCount;
-@property (nonatomic,assign)NSInteger downLoadCounts;//下载数量
+
+
 //单例
 + (YHDownLoadManager *)sharedInstance;
 

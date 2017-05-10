@@ -175,8 +175,6 @@
         
         __weak typeof(self)weakSelf = self;
         
-        
-        [YHDownLoadManager sharedInstance].maxConcurrentCount = 2;
         _model.status = [[YHDownLoadManager sharedInstance] downLoadWithModel:_model complete:^(BOOL success, id obj,NSIndexPath *indexPath,NSArray <NSNumber *>*nextTasks) {
             if(weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(downLoadSuccess:atIndexPath:nextTasks:)]){
                 [weakSelf.delegate downLoadSuccess:success atIndexPath:indexPath nextTasks:nextTasks];

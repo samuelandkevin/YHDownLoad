@@ -12,5 +12,5 @@
 
 @property (nonatomic,assign) NSString *aTitle;
 @property (nonatomic,assign) NSInteger taskCount;
-
+@property (nonatomic,assign) NSInteger concurrentCount;
 @end

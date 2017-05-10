@@ -57,6 +57,10 @@
         _taskCount = 20;
     }
     
+    if (_concurrentCount > 0) {
+        [YHDownLoadManager sharedInstance].maxConcurrentCount = _concurrentCount;
+    }
+    
     //模拟下载任务
     for(int i=0;i< _taskCount; i++){
         YHDownLoadModel *model = [YHDownLoadModel new];
